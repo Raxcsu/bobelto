@@ -23,10 +23,11 @@ def talker():
     pub = rospy.Publisher('chatter', String, queue_size=30)
     rospy.init_node('ADC_pub', anonymous=True)
     rate = rospy.Rate(10) # 10hz
-    print('Reading ADS1x15 values, press Ctrl-C to quit...')
-    # Print nice channel column headers.
-    print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*range(4)))
-    print('-' * 37)
+
+        print('Reading ADS1x15 values, press Ctrl-C to quit...')
+        # Print nice channel column headers.
+        print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*range(4)))
+        print('-' * 37)
 
     while not rospy.is_shutdown():
 
