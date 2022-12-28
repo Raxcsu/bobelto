@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+# license removed for brevity
+import rospy
+import Adafruit_ADS1x15
+import time
+
+from std_msgs.msg import String
+from bobelto_msg.msg import Adc
+
+
+
+# MPU6050 9-DoF Example Printout
+
+from mpu9250_i2c import *
+
+time.sleep(1) # delay necessary to allow mpu9250 to settle
+
+print('recording data')
+while 1:
+    try:
+        ax,ay,az,wx,wy,wz = mpu6050_conv() # read and convert mpu6050 data
+        mx,my,mz = AK8963_conv() # read and convert AK8963 magnetometer data
+    except:
+        continue
+    
+    print('{}'.format('-'*30))
+    print('accel [g]: x = {0:2.2f}, y = {1:2.2f}, z {2:2.2f}= '.format(ax,ay,az))
+    print('gyro [dps]:  x = {0:2.2f}, y = {1:2.2f}, z = {2:2.2f}'.format(wx,wy,wz))
+    print('mag [uT]:   x = {0:2.2f}, y = {1:2.2f}, z = {2:2.2f}'.format(mx,my,mz))
+    print('{}'.format('-'*30))
+    time.sleep(0.1)
+
+
+
+
+
+
+def talker():
+
+    pub = rospy.Publisher('adc_info', Adc, queue_size=5)
+    rospy.init_node('ADC_pub', anonymuos=True)
+    rate = rospy.Rate(10) # 10hz
+    
+    print('Reading ADS1x15 values, press Ctrl-C to quit...')
+    print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*range(4)))
+    print('-' * 37)
+
+    while not rospy.is_shutdown():
+
+        msg = Adc()
+        # values = [0]*4
+        for i in range(4):
+            # Read the specified ADC channel using the previously set gain value.
+            #values[i] = adc.read_adc(i, gain=GAIN)
+            msg[i] = adc.read_adc(i, gain=GAIN)
+        # Print the ADC values.
+        log_msg = '| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*msg)
+        # Pause for half a second.
+
+        rospy.loginfo(log_msg)
+        pub.publish(msg)
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException:
+        pass
+
